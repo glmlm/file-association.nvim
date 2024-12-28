@@ -1,6 +1,7 @@
 # 🤝 File Association
 
-**file-association.nvim** is a Lua plugin for Neovim that associates any application with extensions and allows you to open a file directory on a buffer. It works on a regular buffer, Netrw and other file managers.
+**file-association.nvim** is a Lua plugin for Neovim that associates any application with extensions and allows you to open a file directory on a buffer.
+It works on a regular buffer, Netrw and other file managers.
 
 ## ✨ Features
 
@@ -52,13 +53,13 @@ Install the plugin with your package manager:
     },
     exts = {
       -- NOTE: Enter the program directory as key,
-      -- and the list of file extensions you want to open with it as value
+      -- and the table of file extensions you want to open with it as value
 
       -- For example:
       -- ['/path/to/app'] = { 'ext' },
     },
     -- optional: You can change the file manager that opens when you select a folder directory
-    -- filer = 'xdg-open',
+    -- filer = '/path/to/your_filer',
   },
 }
 ```
