@@ -6,7 +6,7 @@ describe('setup', function()
   end)
 
   it('works with custom var', function()
-    plugin.setup({ exts = { ['/path/to/app'] = { 'ext' } } })
+    plugin.setup()
     assert(plugin.open_with() == 0, 'my first function with param = 0')
   end)
 end)

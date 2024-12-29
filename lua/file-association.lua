@@ -10,6 +10,31 @@ local config = {
   filer = '',
 }
 
+---@class FilePath
+---@field path string
+local FilePath = {}
+FilePath.__index = FilePath
+
+---@param ret_filepath table
+---@return FilePath
+function FilePath.new(ret_filepath)
+  local self = setmetatable({}, FilePath)
+  local filetype = vim.bo.filetype
+  local filepath = module.ret_path(filetype, ret_filepath)
+  self.path = filepath
+  return self
+end
+
+---@return string
+function FilePath:get_filepath()
+  return self.path
+end
+
+---@return string|nil
+function FilePath:get_extension()
+  return self.path:match('%.([%w_]+)$')
+end
+
 ---@class MyModule
 local M = {}
 
@@ -28,9 +53,9 @@ M.open_with = function()
     vim.notify("Association table is not initialized. Please call require('gx-associated').setup first.", 4)
     return 1
   else
-    local filetype = vim.bo.filetype
-    local filepath = module.get_filepath(filetype, M.config.ret_filepath)
-    local file_ext = filepath:match('%.([%w_]+)$')
+    local fp = FilePath.new(M.config.ret_filepath)
+    local filepath = fp:get_filepath()
+    local file_ext = fp:get_extension()
 
     local is_directory = vim.fn.isdirectory(filepath)
     local file_exist = vim.fn.filereadable(filepath)

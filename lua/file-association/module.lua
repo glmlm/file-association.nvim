@@ -28,22 +28,22 @@ end
 ---@param filetype string
 ---@param ret_filepath table
 ---@return string
-function M.get_filepath(filetype, ret_filepath)
+function M.ret_path(filetype, ret_filepath)
   local func = ret_filepath[filetype]
-  local filepath
+  local path
 
   if func then
-    filepath = func()
+    path = func()
   elseif filetype == 'netrw' then
     local netrw_call = vim.fn['netrw#Call']
     local entry = netrw_call('NetrwGetWord')
-    filepath = netrw_call('NetrwFile', entry)
+    path = netrw_call('NetrwFile', entry)
   else
     local filepath_raw = vim.fn.expand('<cfile>')
-    filepath = M.replace_env_var(filepath_raw)
+    path = M.replace_env_var(filepath_raw)
   end
 
-  return filepath
+  return path
 end
 
 return M
