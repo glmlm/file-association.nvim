@@ -1,4 +1,4 @@
-*file-association.txt*    For Neovim >= 0.10.0   Last change: 2024 December 30
+*file-association.txt*    For Neovim >= 0.10.0    Last change: 2025 January 18
 
 ==============================================================================
 Table of Contents                         *file-association-table-of-contents*
@@ -45,6 +45,11 @@ LAZY.NVIM ~
           'gX',
           '<cmd>FileAssociationOpen<CR>',
           desc = 'Open a file with user-associated application',
+        },
+        {
+          'gy',
+          '<cmd>CopyPathToClipboard<CR>',
+          desc = 'Copy a filepath to the clipboard',
         },
       },
       opts = {
