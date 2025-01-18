@@ -28,6 +28,11 @@ Install the plugin with your package manager:
       '<cmd>FileAssociationOpen<CR>',
       desc = 'Open a file with user-associated application',
     },
+    {
+      'gy',
+      '<cmd>CopyPathToClipboard<CR>',
+      desc = 'Copy a filepath to the clipboard',
+    },
   },
   opts = {
     ret_filepath = {

@@ -1,6 +1,3 @@
--- main module file
-local module = require('file-association.module')
-
 ---@class Config
 ---@field ret_filepath table Enter the name of the filer plug-in for the key and the function that returns file path for the value
 ---@field exts table Associate exts to a program
@@ -10,42 +7,22 @@ local config = {
   filer = '',
 }
 
----@class FilePath
----@field path string
-local FilePath = {}
-FilePath.__index = FilePath
-
----@param ret_filepath table
----@return FilePath
-function FilePath.new(ret_filepath)
-  local self = setmetatable({}, FilePath)
-  local filetype = vim.bo.filetype
-  local filepath = module.ret_path(filetype, ret_filepath)
-  self.path = filepath
-  return self
-end
-
----@return string
-function FilePath:get_filepath()
-  return self.path
-end
-
----@return string|nil
-function FilePath:get_extension()
-  return self.path:match('%.([%w_]+)$')
-end
-
 ---@class MyModule
 local M = {}
 
 ---@type Config
 M.config = config
-M.file_associated_table = nil
+
+---@class AssociationTable
+local AssociationTable = require('file-association.association-table')
+---@class FilePath
+local FilePath = require('file-association.filepath')
 
 ---@param args Config?
 M.setup = function(args)
   M.config = vim.tbl_deep_extend('force', M.config, args or {})
-  M.file_associated_table = module.create_association_table(M.config.exts)
+  local at = AssociationTable:init(M.config.exts)
+  M.file_associated_table = at.association_table
 end
 
 M.open_with = function()
@@ -53,9 +30,9 @@ M.open_with = function()
     vim.notify("Association table is not initialized. Please call require('gx-associated').setup first.", 4)
     return 1
   else
-    local fp = FilePath.new(M.config.ret_filepath)
-    local filepath = fp:get_filepath()
-    local file_ext = fp:get_extension()
+    local fp = FilePath:init(M.config.ret_filepath)
+    local filepath = fp.path
+    local file_ext = fp:getExtension()
 
     local is_directory = vim.fn.isdirectory(filepath)
     local file_exist = vim.fn.filereadable(filepath)
@@ -89,6 +66,21 @@ M.open_with = function()
         vim.ui.open(filepath)
       end
     end
+    return 0
+  end
+end
+
+M.copy_filepath = function()
+  local fp = FilePath:init(M.config.ret_filepath)
+  local filepath = fp.path
+
+  local file_exist = vim.fn.filereadable(filepath)
+  local is_directory = vim.fn.isdirectory(filepath)
+  if file_exist == 0 and is_directory == 0 then
+    vim.notify('File not found: ' .. filepath, 3)
+    return 1
+  else
+    vim.fn.setreg('+', filepath)
     return 0
   end
 end
