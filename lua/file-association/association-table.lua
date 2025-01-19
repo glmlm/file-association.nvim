@@ -1,22 +1,19 @@
----@return table
-local function createClass()
-  local class = {}
-  class.__index = class
+---@class AssociationTable
+---@field table table
+local AssociationTable = {}
+AssociationTable.__index = AssociationTable
 
-  function class:new(...)
-    local obj = setmetatable({}, self)
-    if obj.init then
-      obj:init(...)
-    end
-    return obj
-  end
-
-  return class
+---@param prog_exts table
+---@return AssociationTable
+function AssociationTable:new(prog_exts)
+  local obj = setmetatable({}, self)
+  obj.table = self:_retAssociationTable(prog_exts)
+  return obj
 end
 
 ---@param input string
 ---@return string
-local function replaceEnvVar(input)
+function AssociationTable:_replaceEnvVar(input)
   local function retDirOrRawstr(env_var)
     return vim.env[env_var] or ('%' .. env_var .. '%')
   end
@@ -26,26 +23,16 @@ end
 
 ---@param prog_exts table
 ---@return table
-local function retAssociationTable(prog_exts)
+function AssociationTable:_retAssociationTable(prog_exts)
   local association_table = {}
   for prog, exts in pairs(prog_exts) do
     for _, ext in ipairs(exts) do
-      local prog_env = replaceEnvVar(prog)
+      local prog_env = self:_replaceEnvVar(prog)
       association_table[ext] = prog_env
     end
   end
 
   return association_table
-end
-
----@class AssociationTable
-local AssociationTable = createClass()
-
----@param prog_exts table
----@return AssociationTable
-function AssociationTable:init(prog_exts)
-  self.association_table = retAssociationTable(prog_exts)
-  return self
 end
 
 return AssociationTable

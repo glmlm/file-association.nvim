@@ -15,51 +15,42 @@ M.config = config
 
 ---@class AssociationTable
 local AssociationTable = require('file-association.association-table')
+---@class DefaultFiler
+local DefaultFiler = require('file-association.default-filer')
 ---@class FilePath
 local FilePath = require('file-association.filepath')
+
+local filer = DefaultFiler:new(M.config.filer)
+local default_filer = filer.name
 
 ---@param args Config?
 M.setup = function(args)
   M.config = vim.tbl_deep_extend('force', M.config, args or {})
-  local at = AssociationTable:init(M.config.exts)
-  M.file_associated_table = at.association_table
+  local at = AssociationTable:new(M.config.exts)
+  M.association_table = at.table
 end
 
 M.open_with = function()
-  if not M.file_associated_table then
+  if not M.association_table then
     vim.notify("Association table is not initialized. Please call require('gx-associated').setup first.", 4)
     return 1
   else
-    local fp = FilePath:init(M.config.ret_filepath)
+    local fp = FilePath:new(M.config.ret_filepath)
     local filepath = fp.path
     local file_ext = fp:getExtension()
 
     local is_directory = vim.fn.isdirectory(filepath)
     local file_exist = vim.fn.filereadable(filepath)
     if is_directory ~= 0 then
-      local filer
-      if M.config.filer == '' then
-        local sysname = vim.uv.os_uname().sysname
-        if sysname == 'Darwin' then
-          filer = 'open'
-        elseif sysname == 'Windows_NT' then
-          filer = 'explorer'
-        elseif sysname == 'Linux' then
-          filer = 'xdg-open'
-        end
-      else
-        filer = M.config.filer
-      end
-
-      if filer then
-        vim.uv.spawn(filer, { args = { filepath } })
+      if default_filer then
+        vim.uv.spawn(default_filer, { args = { filepath } })
       else
         vim.notify('Could not open filer due to unsupported OS', 3)
       end
     elseif file_exist == 0 then
       vim.notify('File not found: ' .. filepath, 3)
     else
-      local program = M.file_associated_table[file_ext]
+      local program = M.association_table[file_ext]
       if program then
         vim.uv.spawn(program, { args = { filepath } })
       else
@@ -71,7 +62,7 @@ M.open_with = function()
 end
 
 M.copy_filepath = function()
-  local fp = FilePath:init(M.config.ret_filepath)
+  local fp = FilePath:new(M.config.ret_filepath)
   local filepath = fp.path
 
   local file_exist = vim.fn.filereadable(filepath)
