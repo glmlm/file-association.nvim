@@ -20,14 +20,13 @@ local DefaultFiler = require('file-association.default-filer')
 ---@class FilePath
 local FilePath = require('file-association.filepath')
 
-local filer = DefaultFiler:new(M.config.filer)
-local default_filer = filer.name
-
 ---@param args Config?
 M.setup = function(args)
   M.config = vim.tbl_deep_extend('force', M.config, args or {})
   local at = AssociationTable:new(M.config.exts)
   M.association_table = at.table
+  local df = DefaultFiler:new(M.config.filer)
+  M.default_filer = df.name
 end
 
 M.open_with = function()
@@ -42,8 +41,8 @@ M.open_with = function()
     local is_directory = vim.fn.isdirectory(filepath)
     local file_exist = vim.fn.filereadable(filepath)
     if is_directory ~= 0 then
-      if default_filer then
-        vim.uv.spawn(default_filer, { args = { filepath } })
+      if M.default_filer then
+        vim.uv.spawn(M.default_filer, { args = { filepath } })
       else
         vim.notify('Could not open filer due to unsupported OS', 3)
       end
