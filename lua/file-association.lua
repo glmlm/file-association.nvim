@@ -17,8 +17,8 @@ M.config = config
 local AssociationTable = require('file-association.association-table')
 ---@class DefaultFiler
 local DefaultFiler = require('file-association.default-filer')
----@class FilePath
-local FilePath = require('file-association.filepath')
+---@class Path
+local Path = require('file-association.path')
 
 ---@param args Config?
 M.setup = function(args)
@@ -31,29 +31,25 @@ end
 
 M.open_with = function()
   if not M.association_table then
-    vim.notify("Association table is not initialized. Please call require('gx-associated').setup first.", 4)
+    vim.notify("Association table is not initialized. Please call require('file-association').setup first.", 4)
     return 1
   else
-    local fp = FilePath:new(M.config.ret_filepath)
-    local filepath = fp.path
-    local file_ext = fp:getExtension()
+    local path = Path:new(M.config.ret_filepath)
 
-    local is_directory = vim.fn.isdirectory(filepath)
-    local file_exist = vim.fn.filereadable(filepath)
-    if is_directory ~= 0 then
+    if path:isDir() then
       if M.default_filer then
-        vim.uv.spawn(M.default_filer, { args = { filepath } })
+        vim.uv.spawn(M.default_filer, { args = { path.name } })
       else
         vim.notify('Could not open filer due to unsupported OS', 3)
       end
-    elseif file_exist == 0 then
-      vim.notify('File not found: ' .. filepath, 3)
+    elseif not path:isFile() then
+      vim.notify('File not found: ' .. path.name, 3)
     else
-      local program = M.association_table[file_ext]
+      local program = M.association_table[path:getExtension()]
       if program then
-        vim.uv.spawn(program, { args = { filepath } })
+        vim.uv.spawn(program, { args = { path.name } })
       else
-        vim.ui.open(filepath)
+        vim.ui.open(path.name)
       end
     end
     return 0
@@ -61,16 +57,16 @@ M.open_with = function()
 end
 
 M.copy_filepath = function()
-  local fp = FilePath:new(M.config.ret_filepath)
-  local filepath = fp.path
+  local path = Path:new(M.config.ret_filepath)
 
-  local file_exist = vim.fn.filereadable(filepath)
-  local is_directory = vim.fn.isdirectory(filepath)
-  if file_exist == 0 and is_directory == 0 then
-    vim.notify('File not found: ' .. filepath, 3)
+  if not path:isDir() and not path:isFile() then
+    vim.notify('File not found: ' .. path.name, 3)
     return 1
   else
-    vim.fn.setreg('+', filepath)
+    local result = vim.fn.setreg('+', path.name)
+    if result == 0 then
+      vim.notify('Copied to clipboard')
+    end
     return 0
   end
 end

@@ -1,24 +1,34 @@
----@class FilePath
----@field path string
-local FilePath = {}
-FilePath.__index = FilePath
+---@class Path
+---@field name string
+local Path = {}
+Path.__index = Path
 
 ---@param retFilepath table
----@return FilePath
-function FilePath:new(retFilepath)
+---@return Path
+function Path:new(retFilepath)
   local obj = setmetatable({}, self)
-  obj.path = FilePath:_retPath(vim.bo.filetype, retFilepath)
+  obj.name = Path:_retPath(vim.bo.filetype, retFilepath)
   return obj
 end
 
 ---@return string|nil
-function FilePath:getExtension()
-  return self.path:match('%.([%w_]+)$')
+function Path:getExtension()
+  return self.name:match('%.([%w_]+)$')
+end
+
+---@return boolean
+function Path:isDir()
+  return vim.fn.isdirectory(self.name) ~= 0
+end
+
+---@return boolean
+function Path:isFile()
+  return vim.fn.filereadable(self.name) ~= 0
 end
 
 ---@param input string
 ---@return string
-function FilePath:_replaceEnvVar(input)
+function Path:_replaceEnvVar(input)
   local function retDirOrRawstr(env_var)
     return vim.env[env_var] or ('%' .. env_var .. '%')
   end
@@ -29,7 +39,7 @@ end
 ---@param filetype string
 ---@param ret_filepath table
 ---@return string
-function FilePath:_retPath(filetype, ret_filepath)
+function Path:_retPath(filetype, ret_filepath)
   local user_func = ret_filepath[filetype]
   local path
 
@@ -41,10 +51,10 @@ function FilePath:_retPath(filetype, ret_filepath)
     path = netrw_call('NetrwFile', entry)
   else
     local filepath_raw = vim.fn.expand('<cfile>')
-    path = FilePath:_replaceEnvVar(filepath_raw)
+    path = Path:_replaceEnvVar(filepath_raw)
   end
 
   return path
 end
 
-return FilePath
+return Path
