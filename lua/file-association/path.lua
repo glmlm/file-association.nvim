@@ -17,6 +17,17 @@ function Path:new(retFilepath)
   return obj
 end
 
+function Path:copyToClipboard()
+  if self.is_dir or self.is_file then
+    local is_copy_success = vim.fn.setreg('+', self.name)
+    if is_copy_success == 0 then
+      vim.notify('Copied to clipboard')
+    end
+  else
+    vim.notify('File not found: ' .. self.name, 3)
+  end
+end
+
 ---@param input string
 ---@return string
 function Path:_replaceEnvVar(input)

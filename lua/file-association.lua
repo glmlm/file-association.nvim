@@ -53,17 +53,7 @@ end
 
 M.copy_filepath = function()
   local path = Path:new(M.config.ret_filepath)
-
-  if not path.is_dir and not path.is_file then
-    vim.notify('File not found: ' .. path.name, 3)
-    return 1
-  else
-    local result = vim.fn.setreg('+', path.name)
-    if result == 0 then
-      vim.notify('Copied to clipboard')
-    end
-    return 0
-  end
+  path:copyToClipboard()
 end
 
 return M
