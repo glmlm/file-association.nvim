@@ -25,8 +25,7 @@ M.setup = function(args)
   M.config = vim.tbl_deep_extend('force', M.config, args or {})
   local at = AssociationTable:new(M.config.exts)
   M.association_table = at.table
-  local df = DefaultFiler:new(M.config.filer)
-  M.default_filer = df.name
+  M.default_filer = DefaultFiler:new(M.config.filer)
 end
 
 M.open_with = function()
@@ -37,11 +36,7 @@ M.open_with = function()
     local path = Path:new(M.config.ret_filepath)
 
     if path.is_dir then
-      if M.default_filer then
-        vim.uv.spawn(M.default_filer, { args = { path.name } })
-      else
-        vim.notify('Could not open filer due to unsupported OS', 3)
-      end
+      M.default_filer:openDir(path.name)
     elseif not path.is_file then
       vim.notify('File not found: ' .. path.name, 3)
     else
