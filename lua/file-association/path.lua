@@ -1,5 +1,8 @@
 ---@class Path
 ---@field name string
+---@field ext string|nil
+---@field is_dir boolean
+---@field is_file boolean
 local Path = {}
 Path.__index = Path
 
@@ -8,22 +11,10 @@ Path.__index = Path
 function Path:new(retFilepath)
   local obj = setmetatable({}, self)
   obj.name = Path:_retPath(vim.bo.filetype, retFilepath)
+  obj.ext = obj.name:match('%.([%w_]+)$')
+  obj.is_dir = vim.fn.isdirectory(obj.name) ~= 0
+  obj.is_file = vim.fn.filereadable(obj.name) ~= 0
   return obj
-end
-
----@return string|nil
-function Path:getExtension()
-  return self.name:match('%.([%w_]+)$')
-end
-
----@return boolean
-function Path:isDir()
-  return vim.fn.isdirectory(self.name) ~= 0
-end
-
----@return boolean
-function Path:isFile()
-  return vim.fn.filereadable(self.name) ~= 0
 end
 
 ---@param input string

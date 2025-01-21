@@ -36,16 +36,16 @@ M.open_with = function()
   else
     local path = Path:new(M.config.ret_filepath)
 
-    if path:isDir() then
+    if path.is_dir then
       if M.default_filer then
         vim.uv.spawn(M.default_filer, { args = { path.name } })
       else
         vim.notify('Could not open filer due to unsupported OS', 3)
       end
-    elseif not path:isFile() then
+    elseif not path.is_file then
       vim.notify('File not found: ' .. path.name, 3)
     else
-      local program = M.association_table[path:getExtension()]
+      local program = M.association_table[path.ext]
       if program then
         vim.uv.spawn(program, { args = { path.name } })
       else
@@ -59,7 +59,7 @@ end
 M.copy_filepath = function()
   local path = Path:new(M.config.ret_filepath)
 
-  if not path:isDir() and not path:isFile() then
+  if not path.is_dir and not path.is_file then
     vim.notify('File not found: ' .. path.name, 3)
     return 1
   else
