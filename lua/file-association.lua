@@ -4,7 +4,7 @@
 local config = {
 	ret_filepath = {},
 	exts = {},
-	filer = "",
+	filer = '',
 }
 
 ---@class MyModule
@@ -14,15 +14,15 @@ local M = {}
 M.config = config
 
 ---@class AssociationTable
-local AssociationTable = require("file-association.association-table")
+local AssociationTable = require('file-association.association-table')
 ---@class DefaultFiler
-local DefaultFiler = require("file-association.default-filer")
+local DefaultFiler = require('file-association.default-filer')
 ---@class Path
-local Path = require("file-association.path")
+local Path = require('file-association.path')
 
 ---@param args Config?
 M.setup = function(args)
-	M.config = vim.tbl_deep_extend("force", M.config, args or {})
+	M.config = vim.tbl_deep_extend('force', M.config, args or {})
 	local at = AssociationTable:new(M.config.exts)
 	M.association_table = at.table
 	M.default_filer = DefaultFiler:new(M.config.filer)
@@ -33,7 +33,7 @@ M.open_with = function()
 		vim.notify(
 			"Association table is not initialized. Please call require('file-association').setup first.",
 			vim.log.levels.ERROR,
-			{ title = "file-association.nvim" }
+			{ title = 'file-association.nvim' }
 		)
 		return 1
 	else
@@ -42,7 +42,7 @@ M.open_with = function()
 		if path.is_dir then
 			M.default_filer:openDir(path.name)
 		elseif not path.is_file then
-			vim.notify("File not found: " .. path.name, vim.log.levels.WARN, { title = "file-association.nvim" })
+			vim.notify('File not found: ' .. path.name, vim.log.levels.WARN, { title = 'file-association.nvim' })
 		else
 			local program = M.association_table[path.ext]
 			if program then
