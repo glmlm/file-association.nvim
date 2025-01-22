@@ -30,7 +30,11 @@ end
 
 M.open_with = function()
   if not M.association_table then
-    vim.notify("Association table is not initialized. Please call require('file-association').setup first.", 4)
+    vim.notify(
+      "Association table is not initialized. Please call require('file-association').setup first.",
+      vim.log.levels.ERROR,
+      { title = 'file-association.nvim' }
+    )
     return 1
   else
     local path = Path:new(M.config.ret_filepath)
@@ -38,7 +42,7 @@ M.open_with = function()
     if path.is_dir then
       M.default_filer:openDir(path.name)
     elseif not path.is_file then
-      vim.notify('File not found: ' .. path.name, 3)
+      vim.notify('File not found: ' .. path.name, vim.log.levels.WARN, { title = 'file-association.nvim' })
     else
       local program = M.association_table[path.ext]
       if program then

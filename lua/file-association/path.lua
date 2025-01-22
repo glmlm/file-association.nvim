@@ -21,10 +21,14 @@ function Path:copyToClipboard()
   if self.is_dir or self.is_file then
     local is_copy_success = vim.fn.setreg('+', self.name)
     if is_copy_success == 0 then
-      vim.notify('Copied to clipboard')
+      vim.notify('Copied to clipboard', vim.log.levels.INFO, { title='file-association.nvim' })
     end
   else
-    vim.notify('File not found: ' .. self.name, 3)
+    vim.notify(
+      'File not found: ' .. self.name,
+      vim.log.levels.WARN,
+      { title='file-association.nvim' }
+    )
   end
 end
 

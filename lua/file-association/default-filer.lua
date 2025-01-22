@@ -19,9 +19,13 @@ function DefaultFiler:openDir(path)
   if self.errorlevel == 0 then
     vim.uv.spawn(self.name, { args = { path } })
   elseif self.errorlevel == 1 then
-    vim.notify('Filer is not executable: ' .. self.name, 3)
+    vim.notify('Filer is not executable: ' .. self.name, vim.log.levels.WARN, { title='file-association.nvim' })
   else
-    vim.notify('Could not open default filer due to unsupported OS', 4)
+    vim.notify(
+      'Could not open default filer due to unsupported OS',
+      vim.log.levels.ERROR,
+      { title='file-association.nvim' }
+    )
   end
   return self.errorlevel
 end
