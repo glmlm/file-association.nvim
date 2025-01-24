@@ -1,4 +1,4 @@
-*file-association.txt*    For Neovim >= 0.10.0    Last change: 2025 January 21
+*file-association.txt*    For Neovim >= 0.10.0    Last change: 2025 January 24
 
 ==============================================================================
 Table of Contents                         *file-association-table-of-contents*
