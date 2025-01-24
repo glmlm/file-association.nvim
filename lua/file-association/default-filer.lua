@@ -1,8 +1,12 @@
 ---@class DefaultFiler
 ---@field name string
 ---@field errorlevel integer
+---@field message Message
 local DefaultFiler = {}
 DefaultFiler.__index = DefaultFiler
+
+---@class Message
+local Message = require('file-association.message')
 
 ---@param userDefinedFiler string
 ---@return DefaultFiler
@@ -10,6 +14,7 @@ function DefaultFiler:new(userDefinedFiler)
   local obj = setmetatable({}, self)
   obj.name = self:_retFilerName(userDefinedFiler, vim.uv.os_uname().sysname)
   obj.errorlevel = self:_retErrorlevel(obj.name)
+  obj.message = Message:new()
   return obj
 end
 
@@ -19,13 +24,9 @@ function DefaultFiler:openDir(path)
   if self.errorlevel == 0 then
     vim.uv.spawn(self.name, { args = { path } })
   elseif self.errorlevel == 1 then
-    vim.notify('Filer is not executable: ' .. self.name, vim.log.levels.WARN, { title='file-association.nvim' })
+    self.message:display('Filer is not executable: ' .. self.name, 'warn')
   else
-    vim.notify(
-      'Could not open default filer due to unsupported OS',
-      vim.log.levels.ERROR,
-      { title='file-association.nvim' }
-    )
+    self.message:display('Could not open default filer due to unsupported OS', 'error')
   end
   return self.errorlevel
 end

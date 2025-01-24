@@ -3,8 +3,12 @@
 ---@field ext string|nil
 ---@field is_dir boolean
 ---@field is_file boolean
+---@field message Message
 local Path = {}
 Path.__index = Path
+
+---@class Message
+local Message = require('file-association.message')
 
 ---@param retFilepath table
 ---@return Path
@@ -14,6 +18,7 @@ function Path:new(retFilepath)
   obj.ext = obj.name:match('%.([%w_]+)$')
   obj.is_dir = vim.fn.isdirectory(obj.name) ~= 0
   obj.is_file = vim.fn.filereadable(obj.name) ~= 0
+  obj.message = Message:new()
   return obj
 end
 
@@ -21,14 +26,10 @@ function Path:copyToClipboard()
   if self.is_dir or self.is_file then
     local is_copy_success = vim.fn.setreg('+', self.name)
     if is_copy_success == 0 then
-      vim.notify('Copied to clipboard', vim.log.levels.INFO, { title='file-association.nvim' })
+      self.message:display('Copied to clipboard', 'info')
     end
   else
-    vim.notify(
-      'File not found: ' .. self.name,
-      vim.log.levels.WARN,
-      { title='file-association.nvim' }
-    )
+    self.message:display('File not found: ' .. self.name, 'warn')
   end
 end
 

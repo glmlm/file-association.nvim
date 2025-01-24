@@ -19,6 +19,9 @@ local AssociationTable = require('file-association.association-table')
 local DefaultFiler = require('file-association.default-filer')
 ---@class Path
 local Path = require('file-association.path')
+---@class Message
+local Message = require('file-association.message')
+local message = Message:new()
 
 ---@param args Config?
 M.setup = function(args)
@@ -30,11 +33,7 @@ end
 
 M.open_with = function()
   if not M.association_table then
-    vim.notify(
-      "Association table is not initialized. Please call require('file-association').setup first.",
-      vim.log.levels.ERROR,
-      { title = 'file-association.nvim' }
-    )
+    message:display("Association table is not initialized. Please call require('file-association').setup first.", 'error')
     return 1
   else
     local path = Path:new(M.config.ret_filepath)
@@ -42,7 +41,7 @@ M.open_with = function()
     if path.is_dir then
       M.default_filer:openDir(path.name)
     elseif not path.is_file then
-      vim.notify('File not found: ' .. path.name, vim.log.levels.WARN, { title = 'file-association.nvim' })
+      message:display('File not found: ' .. path.name, 'warn')
     else
       local program = M.association_table[path.ext]
       if program then
